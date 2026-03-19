@@ -1,1 +1,1396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contratos GBS NET</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
 
+  :root {
+    --bg: #0d0f14;
+    --surface: #161a23;
+    --surface2: #1e2433;
+    --border: #262d3d;
+    --accent: #4f8ef7;
+    --accent2: #7c5cfc;
+    --text: #e8ecf4;
+    --muted: #6b7a99;
+    --red: #f75555;
+    --orange: #f7953d;
+    --yellow: #f7d155;
+    --green: #3df7a0;
+    --card-h: 120px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0d0f14 0%, #161a23 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo-sub { font-size: 11px; color: var(--muted); font-weight: 400; letter-spacing: 1px; text-transform: uppercase; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .date-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .nav-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    padding: 4px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .nav-tab {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--muted);
+    border: none;
+    background: transparent;
+  }
+
+  .nav-tab.active {
+    background: var(--accent);
+    color: white;
+  }
+
+  .nav-tab:hover:not(.active) { color: var(--text); background: var(--border); }
+
+  /* MAIN */
+  .main { padding: 24px 32px; max-width: 1600px; margin: 0 auto; }
+
+  /* FILTERS */
+  .filters-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+    background: var(--surface);
+    padding: 16px;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+  }
+
+  .filter-group label {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .filter-group select, .filter-group input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .filter-group select:focus, .filter-group input:focus {
+    border-color: var(--accent);
+  }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+
+  .kpi-card:hover { transform: translateY(-2px); }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--color, var(--accent));
+  }
+
+  .kpi-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--color, var(--text));
+  }
+
+  .kpi-sub {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ALERT BANNER */
+  .alert-banner {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .alert-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid;
+    flex: 1;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .alert-pill:hover { opacity: 0.8; }
+  .alert-pill.red { background: rgba(247,85,85,0.1); border-color: rgba(247,85,85,0.3); color: var(--red); }
+  .alert-pill.orange { background: rgba(247,149,61,0.1); border-color: rgba(247,149,61,0.3); color: var(--orange); }
+  .alert-pill.yellow { background: rgba(247,209,85,0.1); border-color: rgba(247,209,85,0.3); color: var(--yellow); }
+  .alert-pill.green { background: rgba(61,247,160,0.1); border-color: rgba(61,247,160,0.3); color: var(--green); }
+
+  .alert-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+  /* CHARTS GRID */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .chart-card.wide { grid-column: span 2; }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 16px;
+  }
+
+  canvas { max-height: 220px; }
+
+  /* TABLE */
+  .table-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-title { font-size: 14px; font-weight: 600; }
+  .table-count { font-size: 12px; color: var(--muted); }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    width: 260px;
+  }
+
+  .search-box input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    outline: none;
+    width: 100%;
+  }
+
+  .search-box .icon { color: var(--muted); font-size: 14px; }
+
+  .export-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    font-family: inherit;
+  }
+
+  .export-btn:hover { opacity: 0.85; }
+
+  .table-wrapper { overflow-x: auto; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    background: var(--surface2);
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  thead th:hover { color: var(--text); }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr:last-child { border-bottom: none; }
+
+  td {
+    padding: 11px 14px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  .cod-cell {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .badge.vencido { background: rgba(247,85,85,0.15); color: var(--red); border: 1px solid rgba(247,85,85,0.3); }
+  .badge.critico { background: rgba(247,149,61,0.15); color: var(--orange); border: 1px solid rgba(247,149,61,0.3); }
+  .badge.atencao { background: rgba(247,209,85,0.15); color: var(--yellow); border: 1px solid rgba(247,209,85,0.3); }
+  .badge.seguro { background: rgba(61,247,160,0.15); color: var(--green); border: 1px solid rgba(61,247,160,0.3); }
+  .badge.indefinido { background: rgba(107,122,153,0.15); color: var(--muted); border: 1px solid rgba(107,122,153,0.3); }
+  .badge.tipo { background: rgba(79,142,247,0.1); color: var(--accent); border: 1px solid rgba(79,142,247,0.2); }
+
+  .money { font-family: 'DM Mono', monospace; font-size: 12px; }
+
+  /* Pagination */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .page-info { font-size: 12px; color: var(--muted); }
+
+  .page-btns { display: flex; gap: 6px; }
+
+  .page-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 12px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .page-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* Detail Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    width: 620px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+  }
+
+  .modal-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+  .modal-title { font-size: 18px; font-weight: 700; }
+  .modal-close { background: var(--surface2); border: 1px solid var(--border); color: var(--text); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .modal-field label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 600; display: block; margin-bottom: 4px; }
+  .modal-field span { font-size: 14px; }
+
+  .modal-field.full { grid-column: span 2; }
+
+  /* VIEW TABS */
+  .view-section { display: none; }
+  .view-section.active { display: block; }
+
+  /* Alert view */
+  .alert-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+  .alert-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    transition: transform 0.2s;
+  }
+
+  .alert-item:hover { transform: translateX(4px); }
+
+  .alert-item.vencido { border-left: 3px solid var(--red); }
+  .alert-item.critico { border-left: 3px solid var(--orange); }
+  .alert-item.atencao { border-left: 3px solid var(--yellow); }
+
+  .alert-icon { font-size: 22px; }
+  .alert-info { flex: 1; }
+  .alert-empresa { font-weight: 600; font-size: 14px; }
+  .alert-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .alert-days { font-size: 22px; font-weight: 700; font-family: 'DM Mono', monospace; }
+
+  /* Responsive */
+  @media (max-width: 1200px) {
+    .kpi-grid { grid-template-columns: repeat(4, 1fr); }
+    .charts-grid { grid-template-columns: 1fr 1fr; }
+    .chart-card.wide { grid-column: span 2; }
+  }
+
+  @media (max-width: 768px) {
+    .main { padding: 16px; }
+    .header { padding: 14px 16px; }
+    .filters-bar { grid-template-columns: 1fr 1fr; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+    .chart-card.wide { grid-column: span 1; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">📋</div>
+    <div>
+      <div class="logo-text">Contratos GBS NET</div>
+      <div class="logo-sub">Sistema de Gestão de Contratos</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="date-badge" id="currentDate"></div>
+    <div id="syncStatus" style="display:none;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);padding:6px 14px;border-radius:20px;font-size:12px;color:var(--muted)">
+      <span id="syncDot" style="width:7px;height:7px;border-radius:50%;background:var(--muted);display:inline-block"></span>
+      <span id="syncText">Aguardando...</span>
+    </div>
+    <button onclick="syncFromSheets()" id="syncBtn" style="display:none;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:7px 14px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;transition:all 0.2s" title="Sincronizar agora">⟳ Sincronizar</button>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="switchView('dashboard')">Dashboard</button>
+      <button class="nav-tab" onclick="switchView('contratos')">Contratos</button>
+      <button class="nav-tab" onclick="switchView('alertas')">Alertas</button>
+      <button class="nav-tab" onclick="switchView('config')">⚙ Config</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- FILTERS -->
+  <div class="filters-bar">
+    <div class="filter-group">
+      <label>Busca</label>
+      <input type="text" id="searchGlobal" placeholder="Empresa, cód, obs..." oninput="applyFilters()">
+    </div>
+    <div class="filter-group">
+      <label>Tipo</label>
+      <select id="filterTipo" onchange="applyFilters()">
+        <option value="">Todos</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Status Vencimento</label>
+      <select id="filterStatus" onchange="applyFilters()">
+        <option value="">Todos</option>
+        <option value="Vencido">🔴 Vencido</option>
+        <option value="Crítico">🟠 Crítico</option>
+        <option value="Atenção">🟡 Atenção</option>
+        <option value="Seguro">🟢 Seguro</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Centro de Custo</label>
+      <select id="filterCentro" onchange="applyFilters()">
+        <option value="">Todos</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Responsável</label>
+      <select id="filterResp" onchange="applyFilters()">
+        <option value="">Todos</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- DASHBOARD VIEW -->
+  <div id="view-dashboard" class="view-section active">
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="kpiGrid"></div>
+
+    <!-- ALERT PILLS -->
+    <div class="alert-banner" id="alertBanner"></div>
+
+    <!-- CHARTS -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-title">Contratos por Tipo</div>
+        <canvas id="chartTipo"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Status de Vencimento</div>
+        <canvas id="chartStatus"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Por Centro de Custo</div>
+        <canvas id="chartCentro"></canvas>
+      </div>
+      <div class="chart-card wide">
+        <div class="chart-title">Top 10 — Valor Total por Fornecedor</div>
+        <canvas id="chartFornecedor"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Por Responsável</div>
+        <canvas id="chartResp"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONTRATOS VIEW -->
+  <div id="view-contratos" class="view-section">
+    <div class="table-section">
+      <div class="table-header">
+        <div>
+          <div class="table-title">Todos os Contratos</div>
+          <div class="table-count" id="tableCount"></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div class="search-box">
+            <span class="icon">🔍</span>
+            <input type="text" id="tableSearch" placeholder="Buscar..." oninput="applyFilters()">
+          </div>
+          <button class="export-btn" onclick="exportCSV()">⬇ Exportar CSV</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortTable('cod')">CÓD ↕</th>
+              <th onclick="sortTable('empresa')">EMPRESA ↕</th>
+              <th onclick="sortTable('tipo')">TIPO ↕</th>
+              <th onclick="sortTable('observacoes')">OBSERVAÇÃO</th>
+              <th onclick="sortTable('valorTotal')">VALOR TOTAL ↕</th>
+              <th onclick="sortTable('valorMensal')">VALOR MENSAL ↕</th>
+              <th onclick="sortTable('dataTermino')">VENCIMENTO ↕</th>
+              <th onclick="sortTable('diasVencimento')">DIAS ↕</th>
+              <th>STATUS</th>
+              <th onclick="sortTable('centroCusto')">CENTRO CUSTO ↕</th>
+              <th onclick="sortTable('responsavel')">RESPONSÁVEL ↕</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <div class="page-info" id="pageInfo"></div>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTAS VIEW -->
+  <div id="view-alertas" class="view-section">
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">⚠️ Central de Alertas</h2>
+      <p style="color:var(--muted);font-size:13px">Contratos que requerem atenção imediata ordenados por urgência</p>
+    </div>
+    <div class="alert-list" id="alertList"></div>
+  </div>
+
+</div>
+
+  <!-- CONFIG VIEW -->
+  <div id="view-config" class="view-section">
+    <div style="max-width:640px;margin:0 auto">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:6px">⚙ Configuração — Google Sheets</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:28px">Conecte sua planilha para sincronização automática em tempo real.</p>
+
+      <!-- Step 1 -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">1</div>
+          <div>
+            <div style="font-weight:600;font-size:15px">Publique sua planilha como CSV</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Isso permite que o dashboard leia os dados sem login</div>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;font-size:13px;line-height:1.8">
+          <div>1. Abra sua planilha no Google Sheets</div>
+          <div>2. Menu <strong style="color:var(--accent)">Arquivo → Compartilhar → Publicar na Web</strong></div>
+          <div>3. Selecione a aba <strong style="color:var(--accent)">"Modelo"</strong></div>
+          <div>4. Formato: <strong style="color:var(--accent)">Valores separados por vírgula (.csv)</strong></div>
+          <div>5. Clique em <strong style="color:var(--accent)">Publicar</strong> e copie o link</div>
+        </div>
+        <div style="margin-top:14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Ou use diretamente este link (sua planilha já detectada):</div>
+          <div style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);word-break:break-all">https://docs.google.com/spreadsheets/d/e/2PACX-1vT8zWWMXeyEjVZWqloWT5K69nohB-1wDu2uOyHjgxrAcs7yxUXZvvHDXTJCUVH_JNeL5Ly96fqU6otB/pub?output=csv</div>
+          <button onclick="useDetectedUrl()" style="margin-top:10px;background:var(--accent);color:white;border:none;padding:7px 16px;border-radius:7px;font-size:12px;cursor:pointer;font-family:inherit">Usar este link</button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:16px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">2</div>
+          <div>
+            <div style="font-weight:600;font-size:15px">Cole o link CSV aqui</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">O dashboard vai buscar os dados automaticamente</div>
+          </div>
+        </div>
+        <div class="filter-group" style="margin-bottom:12px">
+          <label>URL CSV do Google Sheets</label>
+          <input type="text" id="sheetsUrl" placeholder="https://docs.google.com/spreadsheets/d/.../export?format=csv&gid=0"
+            style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:8px;font-size:13px;font-family:'DM Mono',monospace;outline:none">
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button onclick="saveAndSync()" style="background:var(--accent);color:white;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity 0.2s">
+            💾 Salvar e Sincronizar
+          </button>
+          <div id="configMsg" style="font-size:13px;color:var(--muted)"></div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">3</div>
+          <div>
+            <div style="font-weight:600;font-size:15px">Atualização automática</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Configure o intervalo de sincronização</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="filter-group" style="flex:1">
+            <label>Atualizar a cada</label>
+            <select id="autoRefresh" onchange="saveAutoRefresh()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-size:13px;font-family:inherit;outline:none;width:100%">
+              <option value="0">Manual (apenas botão)</option>
+              <option value="60">1 minuto</option>
+              <option value="300">5 minutos</option>
+              <option value="600">10 minutos</option>
+              <option value="1800">30 minutos</option>
+              <option value="3600">1 hora</option>
+            </select>
+          </div>
+          <div style="padding-top:20px;font-size:13px;color:var(--muted)" id="nextSyncInfo">—</div>
+        </div>
+        <div id="lastSyncInfo" style="margin-top:12px;font-size:12px;color:var(--muted)"></div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-top">
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px" id="modalCod"></div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-grid" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ================== GOOGLE SHEETS SYNC ==================
+const SHEET_ID = '2PACX-1vT8zWWMXeyEjVZWqloWT5K69nohB-1wDu2uOyHjgxrAcs7yxUXZvvHDXTJCUVH_JNeL5Ly96fqU6otB';
+const DEFAULT_CSV_URL = `https://docs.google.com/spreadsheets/d/e/${SHEET_ID}/pub?output=csv`;
+
+// Column mapping from spreadsheet headers → internal keys
+const COL_MAP = {
+  'número': 'cod', 'numero': 'cod', 'cod': 'cod',
+  'empresa': 'empresa',
+  'cnpj/cpf': 'cnpj', 'cnpj': 'cnpj',
+  'tipo': 'tipo',
+  'objeto': 'objeto',
+  'valor total': 'valorTotal',
+  'valor mensal': 'valorMensal',
+  'índice reajuste': 'indiceReajuste', 'indice reajuste': 'indiceReajuste', 'índice de reajuste': 'indiceReajuste',
+  'data início': 'dataInicio', 'data inicio': 'dataInicio',
+  'vigência contratual': 'vigencia', 'vigencia contratual': 'vigencia',
+  'data término': 'dataTermino', 'data termino': 'dataTermino',
+  'prazo renovação (meses)': 'prazRenovacao', 'prazo renovacao (meses)': 'prazRenovacao',
+  'multa rescisão': 'multaRescisao', 'multa rescisao': 'multaRescisao',
+  'responsável': 'responsavel', 'responsavel': 'responsavel',
+  'status': 'status',
+  'centro de custo': 'centroCusto',
+  'tags': 'tags',
+  'observações': 'observacoes', 'observacoes': 'observacoes'
+};
+
+let autoRefreshTimer = null;
+let lastSyncTime = null;
+let sheetsConnected = false;
+
+function getSavedUrl() {
+  try { return localStorage.getItem('sheetsUrl') || ''; } catch(e) { return ''; }
+}
+function getSavedRefresh() {
+  try { return parseInt(localStorage.getItem('autoRefresh') || '0'); } catch(e) { return 0; }
+}
+function saveUrl(url) {
+  try { localStorage.setItem('sheetsUrl', url); } catch(e) {}
+}
+function saveRefreshInterval(v) {
+  try { localStorage.setItem('autoRefresh', v); } catch(e) {}
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+
+  // Parse header
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim().toLowerCase());
+  const keys = headers.map(h => COL_MAP[h] || h);
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    // Handle commas inside quoted fields
+    const cells = [];
+    let cur = '', inQ = false;
+    for (const ch of lines[i]) {
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { cells.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    cells.push(cur);
+
+    const obj = {};
+    keys.forEach((k, idx) => {
+      obj[k] = (cells[idx] || '').replace(/^"|"$/g,'').trim();
+    });
+
+    // Skip empty rows
+    if (!obj.cod && !obj.empresa) continue;
+
+    // Type conversions
+    obj.valorTotal = parseFloat((obj.valorTotal || '0').replace(',','.')) || 0;
+    obj.valorMensal = parseFloat((obj.valorMensal || '0').replace(',','.')) || 0;
+    obj.multaRescisao = parseFloat((obj.multaRescisao || '0').replace(',','.')) || 0;
+    obj.prazRenovacao = parseInt(obj.prazRenovacao || '0') || 0;
+    obj.valorAnual = obj.valorMensal * 12;
+
+    // Normalize dates
+    obj.dataInicio = normalizeDate(obj.dataInicio || '');
+    obj.dataTermino = normalizeDate(obj.dataTermino || '');
+
+    // Status defaults
+    if (!obj.status) obj.status = 'Ativo';
+
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function normalizeDate(d) {
+  if (!d) return '';
+  // Already YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return d;
+  // DD/MM/YYYY
+  const m1 = d.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (m1) return `${m1[3]}-${m1[2]}-${m1[1]}`;
+  // DD/MM/YY
+  const m2 = d.match(/^(\d{2})\/(\d{2})\/(\d{2})$/);
+  if (m2) return `20${m2[3]}-${m2[2]}-${m2[1]}`;
+  return d;
+}
+
+async function syncFromSheets(showMsg = true) {
+  const url = getSavedUrl() || DEFAULT_CSV_URL;
+  setSyncStatus('loading', '🔄 Sincronizando...');
+
+  const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}&t=${Date.now()}`;
+
+  try {
+    const res = await fetch(proxyUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    if (!text || text.includes('<!DOCTYPE')) throw new Error('Resposta inválida — verifique se a planilha está publicada como CSV.');
+
+    const parsed = parseCSV(text);
+    if (parsed.length === 0) throw new Error('Nenhum dado encontrado. Verifique a aba "Modelo".');
+
+    // Update global DATA
+    processAndLoad(parsed);
+    lastSyncTime = new Date();
+    sheetsConnected = true;
+
+    setSyncStatus('ok', `✓ ${parsed.length} contratos — ${lastSyncTime.toLocaleTimeString('pt-BR')}`);
+    updateLastSyncInfo();
+    if (showMsg) setConfigMsg(`✅ ${parsed.length} contratos carregados com sucesso!`, 'var(--green)');
+    startAutoRefresh();
+
+  } catch (err) {
+    setSyncStatus('error', '✗ Erro na sincronização');
+    if (showMsg) setConfigMsg(`❌ Erro: ${err.message}`, 'var(--red)');
+    console.error('Sheets sync error:', err);
+  }
+}
+
+function processAndLoad(rows) {
+  const todayD = new Date();
+  todayD.setHours(0,0,0,0);
+
+  const processed = rows.map(c => {
+    if (c.dataTermino) {
+      const d = new Date(c.dataTermino);
+      if (!isNaN(d) && d.getFullYear() < 2500) {
+        const diff = Math.round((d - todayD) / 86400000);
+        const sv = diff < 0 ? 'Vencido' : diff <= 30 ? 'Crítico' : diff <= 60 ? 'Atenção' : 'Seguro';
+        return {...c, diasVencimento: diff, statusVencimento: sv};
+      }
+    }
+    return {...c, diasVencimento: null, statusVencimento: c.dataTermino ? 'Seguro' : 'Indefinido'};
+  });
+
+  // Replace global DATA
+  DATA.length = 0;
+  processed.forEach(r => DATA.push(r));
+  filtered = [...DATA];
+
+  // Rebuild filter dropdowns
+  rebuildFilters();
+  applyFilters();
+}
+
+function rebuildFilters() {
+  ['filterTipo','filterCentro','filterResp'].forEach(id => {
+    const sel = document.getElementById(id);
+    const val = sel.value;
+    sel.innerHTML = '<option value="">Todos</option>';
+    sel.value = val;
+  });
+  const tipos = [...new Set(DATA.map(d => d.tipo))].filter(Boolean).sort();
+  const centros = [...new Set(DATA.map(d => d.centroCusto))].filter(Boolean).sort();
+  const resps = [...new Set(DATA.map(d => d.responsavel))].filter(Boolean).sort();
+  populate('filterTipo', tipos);
+  populate('filterCentro', centros);
+  populate('filterResp', resps);
+}
+
+function setSyncStatus(state, text) {
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncText');
+  const status = document.getElementById('syncStatus');
+  const btn = document.getElementById('syncBtn');
+  status.style.display = 'flex';
+  btn.style.display = 'block';
+  txt.textContent = text;
+  if (state === 'ok') dot.style.background = 'var(--green)';
+  else if (state === 'error') dot.style.background = 'var(--red)';
+  else dot.style.background = 'var(--yellow)';
+}
+
+function setConfigMsg(msg, color) {
+  const el = document.getElementById('configMsg');
+  if (el) { el.textContent = msg; el.style.color = color; }
+}
+
+function updateLastSyncInfo() {
+  const el = document.getElementById('lastSyncInfo');
+  if (el && lastSyncTime) {
+    el.textContent = `Última sincronização: ${lastSyncTime.toLocaleString('pt-BR')}`;
+  }
+}
+
+function saveAndSync() {
+  const url = document.getElementById('sheetsUrl').value.trim();
+  if (!url) { setConfigMsg('⚠️ Cole o link CSV primeiro.', 'var(--yellow)'); return; }
+  saveUrl(url);
+  setConfigMsg('⏳ Conectando...', 'var(--muted)');
+  syncFromSheets(true);
+}
+
+function useDetectedUrl() {
+  const url = DEFAULT_CSV_URL;
+  document.getElementById('sheetsUrl').value = url;
+  saveUrl(url);
+  setConfigMsg('⏳ Conectando com a planilha detectada...', 'var(--muted)');
+  syncFromSheets(true);
+}
+
+function saveAutoRefresh() {
+  const v = parseInt(document.getElementById('autoRefresh').value);
+  saveRefreshInterval(v);
+  startAutoRefresh();
+  const el = document.getElementById('nextSyncInfo');
+  if (el) el.textContent = v > 0 ? `Próxima: em ${v < 60 ? v+'s' : (v/60)+'min'}` : 'Apenas manual';
+}
+
+function startAutoRefresh() {
+  if (autoRefreshTimer) clearInterval(autoRefreshTimer);
+  const v = getSavedRefresh();
+  if (v > 0) {
+    autoRefreshTimer = setInterval(() => syncFromSheets(false), v * 1000);
+  }
+}
+
+// ================== FALLBACK STATIC DATA ==================
+const RAW_DATA = [{"cod": "Aluguel.01", "empresa": "Leticia Mendes Dieter", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 30000.0, "valorMensal": 500.0, "indiceReajuste": "IGPM", "dataInicio": "2023-11-25", "dataTermino": "2028-11-25", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aluguel", "observacoes": "Repetidora Castanhal", "diasVencimento": 981, "statusVencimento": "Seguro", "valorAnual": 6000.0}, {"cod": "Aluguel.02", "empresa": "Maria Celia de Moraes Vieira", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 0.0, "valorMensal": 1500.0, "indiceReajuste": "IGPM", "dataInicio": "2023-12-20", "dataTermino": "2026-12-19", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Comercial", "tags": "Aluguel", "observacoes": "Ponto Barcarena Sede", "diasVencimento": 274, "statusVencimento": "Seguro", "valorAnual": 18000.0}, {"cod": "Aluguel.03", "empresa": "Laelia Machado Fernandes", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 0.0, "valorMensal": 2000.0, "indiceReajuste": "IGPM", "dataInicio": "2023-10-15", "dataTermino": "2028-10-15", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Comercial", "tags": "Aluguel", "observacoes": "Ponto Outeiro", "diasVencimento": 940, "statusVencimento": "Seguro", "valorAnual": 24000.0}, {"cod": "Aluguel.04", "empresa": "Maria Rutilene dos anjos Silva", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 0.0, "valorMensal": 200.0, "indiceReajuste": "IGPM", "dataInicio": "2025-04-29", "dataTermino": "2028-04-29", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aluguel", "observacoes": "POP Castanhandeua", "diasVencimento": 771, "statusVencimento": "Seguro", "valorAnual": 2400.0}, {"cod": "Aluguel.05", "empresa": "Vanilza da Silva Costa", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 1200.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2021-04-01", "dataTermino": "2026-03-31", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Comercial", "tags": "Aluguel", "observacoes": "Ponto Comercial Bujaru", "diasVencimento": 11, "statusVencimento": "Cr\u00edtico", "valorAnual": 0.0}, {"cod": "Aluguel.06", "empresa": "Maria de Nazare Pontes da Silva", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 800.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2024-09-01", "dataTermino": "2025-03-01", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aluguel", "observacoes": "Casa de Apoio Concordia", "diasVencimento": -384, "statusVencimento": "Vencido", "valorAnual": 0.0}, {"cod": "Aluguel.07", "empresa": "Condominio Ville Laguna", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 600.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2024-01-02", "dataTermino": "2025-01-25", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aluguel", "observacoes": "Condominio Ville Laguna", "diasVencimento": -419, "statusVencimento": "Vencido", "valorAnual": 0.0}, {"cod": "Aluguel.08", "empresa": "Nilza Rabelo Martins", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 1400.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2021-09-10", "dataTermino": "2022-08-10", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aluguel", "observacoes": "POP Marex", "diasVencimento": -1318, "statusVencimento": "Vencido", "valorAnual": 0.0}, {"cod": "Aluguel.09", "empresa": "Eurico Vieira Correa", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 1200.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2024-03-10", "dataTermino": "2025-03-10", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aluguel", "observacoes": "Casa de apoio Tailandia", "diasVencimento": -375, "statusVencimento": "Vencido", "valorAnual": 0.0}, {"cod": "Aluguel.10", "empresa": "Antonio Sitonio Rodrigues Alves", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 700.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2022-10-03", "dataTermino": "2025-10-03", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Comercial", "tags": "Aluguel", "observacoes": "Ponto Comercial Aurora", "diasVencimento": -168, "statusVencimento": "Vencido", "valorAnual": 0.0}, {"cod": "Aluguel.11", "empresa": "Elinete Maria Carvalho Fernandes", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 4500.0, "valorMensal": 4500.0, "indiceReajuste": "IGPM", "dataInicio": "2025-04-29", "dataTermino": "2027-04-29", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aluguel", "observacoes": "Ponto comercial Moju", "diasVencimento": 405, "statusVencimento": "Seguro", "valorAnual": 54000.0}, {"cod": "Aluguel.12", "empresa": "Juliana de Fatima", "cnpj": "", "tipo": "Aluguel", "objeto": "", "valorTotal": 3000.0, "valorMensal": 0, "indiceReajuste": "IGPM", "dataInicio": "2025-07-20", "dataTermino": "2027-07-20", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aluguel", "observacoes": "Ponto comercial Juliana", "diasVencimento": 487, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.01", "empresa": "Delpupo e Moro", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 5000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2014-03-19", "dataTermino": "3000-03-19", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Terreno SDC - QD 26, Lote 07", "diasVencimento": 355745, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.02", "empresa": "Delpupo e Moro", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 5000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2014-03-19", "dataTermino": "3000-03-19", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Terreno SDC - QD 26, Lote 27", "diasVencimento": 355745, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.03", "empresa": "Delpupo e Moro", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 5000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2014-03-19", "dataTermino": "3000-03-19", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Terreno SDC - QD 26, Lote 28", "diasVencimento": 355745, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.04", "empresa": "Delpupo e Moro", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 5000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2014-03-19", "dataTermino": "3000-03-19", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Terreno SDC - QD 26, Lote 29", "diasVencimento": 355745, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.05", "empresa": "Edir Nazare Magno", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 11000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2019-07-15", "dataTermino": "3000-07-15", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Tv. Miguel costa, quadras 299 e 274, Barcarena", "diasVencimento": 355863, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.06", "empresa": "Maria da Conceicao de Oliveira", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 150000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2021-07-01", "dataTermino": "3000-07-01", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Juliana Rodrigues", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Roda d'agua", "diasVencimento": 355849, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.07", "empresa": "Paulo Cesar Pinto", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 215000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2019-01-02", "dataTermino": "3000-01-02", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "2\u00b0 TV, Bairro novo \u2013 Pr\u00f3x a CEIA", "diasVencimento": 355669, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.08", "empresa": "Valdene Goncalves Menezes", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 48000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2020-11-06", "dataTermino": "3000-11-06", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "1\u00b0 TV alveslandia, Quatro Bocas.", "diasVencimento": 355977, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.09", "empresa": "Sandro Seiji", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 30000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2020-10-28", "dataTermino": "3000-10-28", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "1\u00b0 TV alveslandia, Quatro Bocas.", "diasVencimento": 355968, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.10", "empresa": "Pedro Antonio Vaz da Silva", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 400000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2021-06-28", "dataTermino": "3000-06-28", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "AV. Francisco Vinagre, Vila dos Cabanos", "diasVencimento": 355846, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.11", "empresa": "Jose de Sousa Rolim", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 700000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2021-10-14", "dataTermino": "3000-10-14", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "AV. Marechal Deodoro, Concordia", "diasVencimento": 355954, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.12", "empresa": "Leiva Oliveira", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 400000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2024-12-06", "dataTermino": "3000-12-06", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "GBS Participacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Parque Office", "diasVencimento": 356007, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.13", "empresa": "Raimunda Berila Veloso Barra", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 250000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2019-04-02", "dataTermino": "3000-04-02", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Ramal mariquita, zona rural, Tom\u00e9 A\u00e7u", "diasVencimento": 355759, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.14", "empresa": "Gilberto Faria Junior", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 301643.29, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2017-01-31", "dataTermino": "3000-01-31", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Pleno Residencial, Ananindeua", "diasVencimento": 355698, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.15", "empresa": "Jose Marcelo Gomes da Silva", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 5500.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2010-12-21", "dataTermino": "3000-12-21", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Palmares", "diasVencimento": 356022, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.16", "empresa": "Manoel Cristo da Silva", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 1500.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2011-06-22", "dataTermino": "3000-06-22", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "RD. PA 252, KM 14, Acar\u00e1", "diasVencimento": 355840, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.17", "empresa": "Luciana Alves Catrinque", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 825000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2021-06-28", "dataTermino": "3000-06-28", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Quadra D, TV. 04, Residencial Ipitinga", "diasVencimento": 355846, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.18", "empresa": "Arlen Vinicius Rodrigues", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 14000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2018-06-01", "dataTermino": "3000-06-01", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gleice Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Rua Pedro Vieira, M\u00e3e do Rio", "diasVencimento": 355819, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.19", "empresa": "Cesar Roberto Pinto Lima", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 30000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2011-09-17", "dataTermino": "3000-09-17", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "-", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "2\u00b0 TV, Bairro novo \u2013 Pr\u00f3x a CEIA", "diasVencimento": 355927, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.20", "empresa": "Carlos Alberto Gomes da Silva", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 10000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2011-05-07", "dataTermino": "3000-05-07", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Diego Joao da Silva Moreira", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Rua Orlando Silva, Bairro Tsuruzaki", "diasVencimento": 355794, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.21", "empresa": "Leila Nazare da Silva", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 300000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2022-04-06", "dataTermino": "3000-04-06", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Rua Orlando Gomes, condominio HIRAGA, Quatro Bocas", "diasVencimento": 355763, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.22", "empresa": "Carlos Nazareno Ferreira do Amaral", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 550000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2019-04-20", "dataTermino": "3000-04-20", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Av. 01\u00b0 Setembro, 239, Centro, Tom\u00e9 A\u00e7u", "diasVencimento": 355777, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.23", "empresa": "Delpupo e Moro", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 5000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2014-03-19", "dataTermino": "3000-03-19", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Terreno SDC - QD 26, Lote 30", "diasVencimento": 355745, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.24", "empresa": "Erivelton Oliveira Bomfim", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 350000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2022-01-05", "dataTermino": "3000-01-05", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Av. Palmeiras, Moju", "diasVencimento": 355672, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.25", "empresa": "Fabilson Araujo de Carvalho", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 220000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2023-06-29", "dataTermino": "3000-06-29", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Av. Natal, n\u00b0 104, Tailandia", "diasVencimento": 355847, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.26", "empresa": "Arthur Bezerra Alves", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 700000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2023-10-31", "dataTermino": "3000-10-31", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "AV. Francisco Vinagre, Vila dos Cabanos", "diasVencimento": 355971, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.27", "empresa": "Edson Siqueira Pantoja", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 400000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2023-11-22", "dataTermino": "3000-11-22", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "PA 124, n\u00b0 39, Bairro Nova Brasilia, Salinas", "diasVencimento": 355993, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.28", "empresa": "Bruno Portilho", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 25000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2019-06-03", "dataTermino": "3000-06-03", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gabriel Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Residencial conquista II, quadra 03, lote 06", "diasVencimento": 355821, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.29", "empresa": "Bruno Portilho", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 25000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2019-06-03", "dataTermino": "3000-06-03", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gabriel Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Residencial conquista II, quadra 03, lote 05", "diasVencimento": 355821, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.30", "empresa": "Daniel Maria Sanches Pinto", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 70000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2016-11-21", "dataTermino": "3000-11-21", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Av. Cameta, Quatro Bocas - CEIA", "diasVencimento": 355992, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.31", "empresa": "Carine Aparecida Rocha Lima", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 80000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2017-09-20", "dataTermino": "3000-09-20", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Av. Cameta, Quatro Bocas - CEIA", "diasVencimento": 355930, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.32", "empresa": "Carine Aparecida Rocha Lima", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 150000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2016-02-15", "dataTermino": "3000-02-15", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Av. Cameta, Quatro Bocas - CEIA", "diasVencimento": 355713, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.33", "empresa": "Carine Aparecida Rocha Lima", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 150000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2016-02-15", "dataTermino": "3000-02-15", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Av. Cameta, Quatro Bocas - CEIA", "diasVencimento": 355713, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.34", "empresa": "Marcelo Nascimento Viana", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 11000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2019-04-29", "dataTermino": "3000-04-29", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Tv. Miguel costa, quadras 299 e 274, Barcarena", "diasVencimento": 355786, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.35", "empresa": "Renato Cavalcante Costa", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 0.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "", "dataTermino": "", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "GBS Participacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Vila Frienze", "diasVencimento": null, "statusVencimento": "Indefinido", "valorAnual": 0.0}, {"cod": "Imovel.36", "empresa": "Joaquim Lima das Neves", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 200000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2021-06-10", "dataTermino": "3000-06-10", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "GBS Telecom", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Alameda Francisco Nobre, Park Nobre, Ananindeua", "diasVencimento": 355828, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.37", "empresa": "Maria Helena Rabelo Nagata", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 7000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2015-09-18", "dataTermino": "3000-09-18", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Gewerton Barreto", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Tabom, lado esquero caixa d'agua, tome acu", "diasVencimento": 355928, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Imovel.38", "empresa": "Simao de Oliveira", "cnpj": "", "tipo": "Compra", "objeto": "", "valorTotal": 40000.0, "valorMensal": 0.0, "indiceReajuste": "IGPM", "dataInicio": "2011-12-01", "dataTermino": "3000-12-01", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Administrativo", "tags": "Aquisi\u00e7\u00e3o", "observacoes": "Residencial Sidina, Tome Acu", "diasVencimento": 356002, "statusVencimento": "Seguro", "valorAnual": 0.0}, {"cod": "Servi\u00e7os.01", "empresa": "Moacir da Silva Araujo Junior", "cnpj": "", "tipo": "Servi\u00e7o", "objeto": "", "valorTotal": 2100.0, "valorMensal": 2100.0, "indiceReajuste": "IGPM", "dataInicio": "2024-07-23", "dataTermino": "3000-07-23", "prazRenovacao": 0, "multaRescisao": 0, "responsavel": "Norte Telecomunicacoes", "status": "Ativo", "centroCusto": "Infraestrutura", "tags": "Servi\u00e7os", "observacoes": "Consultor de Projetos", "diasVencimento": 355871, "statusVencimento": "Seguro", "valorAnual": 25200.0}];
+
+// Recalculate dias_vencimento dynamically from static fallback
+const today = new Date();
+today.setHours(0,0,0,0);
+const DATA = RAW_DATA.map(c => {
+  if (c.dataTermino) {
+    const d = new Date(c.dataTermino);
+    if (d.getFullYear() < 2500) {
+      const diff = Math.round((d - today) / 86400000);
+      let sv = diff < 0 ? 'Vencido' : diff <= 30 ? 'Crítico' : diff <= 60 ? 'Atenção' : 'Seguro';
+      return {...c, diasVencimento: diff, statusVencimento: sv};
+    }
+  }
+  return c;
+});
+
+// ================== STATE ==================
+let filtered = [...DATA];
+let sortKey = 'diasVencimento';
+let sortDir = 1;
+let page = 1;
+const perPage = 15;
+let charts = {};
+
+// ================== INIT ==================
+function init() {
+  document.getElementById('currentDate').textContent = today.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+
+  // Populate filters from static data first
+  const tipos = [...new Set(DATA.map(d => d.tipo))].sort();
+  const centros = [...new Set(DATA.map(d => d.centroCusto))].filter(Boolean).sort();
+  const resps = [...new Set(DATA.map(d => d.responsavel))].filter(Boolean).sort();
+  populate('filterTipo', tipos);
+  populate('filterCentro', centros);
+  populate('filterResp', resps);
+
+  applyFilters();
+
+  // Load saved config
+  const savedUrl = getSavedUrl();
+  const urlInput = document.getElementById('sheetsUrl');
+  if (urlInput && savedUrl) urlInput.value = savedUrl;
+
+  const savedRefresh = getSavedRefresh();
+  const refreshSel = document.getElementById('autoRefresh');
+  if (refreshSel) refreshSel.value = savedRefresh;
+
+  // Auto-sync on load if URL saved
+  if (savedUrl || true) {
+    // Always try to sync with the detected sheet on load
+    setTimeout(() => syncFromSheets(false), 800);
+  }
+}
+
+function populate(id, opts) {
+  const sel = document.getElementById(id);
+  opts.forEach(o => sel.innerHTML += `<option value="${o}">${o}</option>`);
+}
+
+// ================== FILTERS ==================
+function applyFilters() {
+  const search = (document.getElementById('searchGlobal').value || document.getElementById('tableSearch').value || '').toLowerCase();
+  const tipo = document.getElementById('filterTipo').value;
+  const status = document.getElementById('filterStatus').value;
+  const centro = document.getElementById('filterCentro').value;
+  const resp = document.getElementById('filterResp').value;
+
+  filtered = DATA.filter(c => {
+    if (tipo && c.tipo !== tipo) return false;
+    if (status && c.statusVencimento !== status) return false;
+    if (centro && c.centroCusto !== centro) return false;
+    if (resp && c.responsavel !== resp) return false;
+    if (search) {
+      const hay = `${c.empresa} ${c.cod} ${c.observacoes} ${c.tags}`.toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+
+  page = 1;
+  render();
+}
+
+// ================== RENDER ==================
+function render() {
+  renderKPIs();
+  renderAlertBanner();
+  renderCharts();
+  renderTable();
+  renderAlerts();
+}
+
+function renderKPIs() {
+  const total = filtered.length;
+  const ativos = filtered.filter(c => c.status === 'Ativo').length;
+  const vencidos = filtered.filter(c => c.statusVencimento === 'Vencido').length;
+  const criticos = filtered.filter(c => c.statusVencimento === 'Crítico').length;
+  const atencao = filtered.filter(c => c.statusVencimento === 'Atenção').length;
+  const seguros = filtered.filter(c => c.statusVencimento === 'Seguro').length;
+  const valorTotal = filtered.reduce((a,c) => a + c.valorTotal, 0);
+  const valorMensal = filtered.reduce((a,c) => a + c.valorMensal, 0);
+
+  const kpis = [
+    { label: 'Total Contratos', value: total, color: '#4f8ef7' },
+    { label: 'Ativos', value: ativos, color: '#3df7a0' },
+    { label: 'Vencidos', value: vencidos, color: '#f75555' },
+    { label: 'Críticos (30d)', value: criticos, color: '#f7953d' },
+    { label: 'Atenção (60d)', value: atencao, color: '#f7d155' },
+    { label: 'Seguros', value: seguros, color: '#3df7a0' },
+    { label: 'Valor Total', value: 'R$ ' + fmtM(valorTotal), color: '#7c5cfc', sub: 'patrimônio total' },
+    { label: 'Valor Mensal', value: 'R$ ' + fmtK(valorMensal), color: '#4f8ef7', sub: 'compromisso mensal' },
+  ];
+
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+    <div class="kpi-card" style="--color:${k.color}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      ${k.sub ? `<div class="kpi-sub">${k.sub}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderAlertBanner() {
+  const v = filtered.filter(c => c.statusVencimento === 'Vencido').length;
+  const cr = filtered.filter(c => c.statusVencimento === 'Crítico').length;
+  const at = filtered.filter(c => c.statusVencimento === 'Atenção').length;
+  const se = filtered.filter(c => c.statusVencimento === 'Seguro').length;
+
+  document.getElementById('alertBanner').innerHTML = `
+    <div class="alert-pill red" onclick="filterByStatus('Vencido')">
+      <div class="alert-dot"></div> <strong>${v}</strong> Contrato${v!==1?'s':''} Vencido${v!==1?'s':''}
+    </div>
+    <div class="alert-pill orange" onclick="filterByStatus('Crítico')">
+      <div class="alert-dot"></div> <strong>${cr}</strong> Crítico${cr!==1?'s':''} (≤30 dias)
+    </div>
+    <div class="alert-pill yellow" onclick="filterByStatus('Atenção')">
+      <div class="alert-dot"></div> <strong>${at}</strong> Em Atenção (≤60 dias)
+    </div>
+    <div class="alert-pill green" onclick="filterByStatus('')">
+      <div class="alert-dot" style="animation:none"></div> <strong>${se}</strong> Contrato${se!==1?'s':''} Seguro${se!==1?'s':''}
+    </div>
+  `;
+}
+
+function filterByStatus(s) {
+  document.getElementById('filterStatus').value = s;
+  applyFilters();
+  switchView('contratos');
+}
+
+function renderCharts() {
+  // Tipo
+  const tipoCount = countBy(filtered, 'tipo');
+  renderDoughnut('chartTipo', Object.keys(tipoCount), Object.values(tipoCount), ['#4f8ef7','#f7953d','#3df7a0','#f75555','#7c5cfc','#f7d155']);
+
+  // Status vencimento
+  const sv = {'Vencido':0,'Crítico':0,'Atenção':0,'Seguro':0,'Indefinido':0};
+  filtered.forEach(c => { if (sv[c.statusVencimento] !== undefined) sv[c.statusVencimento]++; });
+  renderDoughnut('chartStatus',
+    Object.keys(sv).filter(k => sv[k]>0),
+    Object.values(sv).filter(v => v>0),
+    ['#f75555','#f7953d','#f7d155','#3df7a0','#6b7a99']
+  );
+
+  // Centro de custo
+  const cc = countBy(filtered, 'centroCusto');
+  renderDoughnut('chartCentro', Object.keys(cc), Object.values(cc), ['#4f8ef7','#7c5cfc','#3df7a0','#f7953d']);
+
+  // Top 10 fornecedor por valor total
+  const forn = {};
+  filtered.forEach(c => {
+    forn[c.empresa] = (forn[c.empresa] || 0) + c.valorTotal;
+  });
+  const sorted = Object.entries(forn).sort((a,b) => b[1]-a[1]).slice(0,10);
+  renderBar('chartFornecedor', sorted.map(e => e[0].length > 20 ? e[0].substring(0,18)+'…' : e[0]), sorted.map(e => e[1]));
+
+  // Responsável
+  const resp = countBy(filtered, 'responsavel');
+  renderDoughnut('chartResp', Object.keys(resp), Object.values(resp), ['#4f8ef7','#7c5cfc','#3df7a0','#f7953d','#f75555','#f7d155','#aabbcc']);
+}
+
+function renderDoughnut(id, labels, data, colors) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  charts[id] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#0d0f14', borderWidth: 2 }] },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#6b7a99', font: { size: 11, family: 'DM Sans' }, padding: 12, boxWidth: 12 } },
+        tooltip: { backgroundColor: '#1e2433', titleColor: '#e8ecf4', bodyColor: '#6b7a99', borderColor: '#262d3d', borderWidth: 1 }
+      },
+      cutout: '65%'
+    }
+  });
+}
+
+function renderBar(id, labels, data) {
+  if (charts[id]) charts[id].destroy();
+  const ctx = document.getElementById(id);
+  charts[id] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: data.map((_,i) => `hsl(${220 + i*15}, 70%, ${50+i*2}%)`),
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1e2433', titleColor: '#e8ecf4', bodyColor: '#6b7a99',
+          callbacks: { label: ctx => 'R$ ' + fmtK(ctx.parsed.x) }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#6b7a99', font: { size: 10 }, callback: v => 'R$ ' + fmtK(v) },
+          grid: { color: '#262d3d' }
+        },
+        y: { ticks: { color: '#e8ecf4', font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+// ================== TABLE ==================
+function sortTable(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = 1; }
+  renderTable();
+}
+
+function renderTable() {
+  const sorted = [...filtered].sort((a,b) => {
+    let av = a[sortKey] ?? '', bv = b[sortKey] ?? '';
+    if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * sortDir;
+    return String(av).localeCompare(String(bv)) * sortDir;
+  });
+
+  const total = sorted.length;
+  const pages = Math.ceil(total / perPage);
+  const start = (page-1) * perPage;
+  const slice = sorted.slice(start, start + perPage);
+
+  document.getElementById('tableCount').textContent = `${total} contrato${total!==1?'s':''}`;
+  document.getElementById('pageInfo').textContent = `Exibindo ${start+1}–${Math.min(start+perPage, total)} de ${total}`;
+
+  const colors = { Vencido: 'vencido', 'Crítico': 'critico', 'Atenção': 'atencao', Seguro: 'seguro', Indefinido: 'indefinido' };
+  const icons = { Vencido: '🔴', 'Crítico': '🟠', 'Atenção': '🟡', Seguro: '🟢', Indefinido: '⚪' };
+
+  document.getElementById('tableBody').innerHTML = slice.map(c => `
+    <tr onclick="showDetail('${c.cod}')" style="cursor:pointer">
+      <td class="cod-cell">${c.cod}</td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis">${c.empresa}</td>
+      <td><span class="badge tipo">${c.tipo}</span></td>
+      <td style="color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis">${c.observacoes || '—'}</td>
+      <td class="money">R$ ${fmtK(c.valorTotal)}</td>
+      <td class="money">${c.valorMensal > 0 ? 'R$ ' + fmtK(c.valorMensal) : '—'}</td>
+      <td class="money">${c.dataTermino && c.dataTermino.length === 10 ? fmtDate(c.dataTermino) : '—'}</td>
+      <td class="money" style="color:${diasColor(c.diasVencimento)}">${c.diasVencimento !== null && c.dataTermino && new Date(c.dataTermino).getFullYear() < 2500 ? (c.diasVencimento < 0 ? c.diasVencimento + 'd' : '+' + c.diasVencimento + 'd') : '∞'}</td>
+      <td><span class="badge ${colors[c.statusVencimento] || 'indefinido'}">${icons[c.statusVencimento] || '⚪'} ${c.statusVencimento}</span></td>
+      <td style="color:var(--muted);font-size:12px">${c.centroCusto}</td>
+      <td style="color:var(--muted);font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis">${c.responsavel}</td>
+    </tr>
+  `).join('');
+
+  // Pagination
+  const maxBtns = 7;
+  let btns = '';
+  btns += `<button class="page-btn" onclick="goPage(${page-1})" ${page===1?'disabled':''}>‹</button>`;
+  for (let i = 1; i <= pages; i++) {
+    if (pages <= maxBtns || i === 1 || i === pages || Math.abs(i - page) <= 2) {
+      btns += `<button class="page-btn ${i===page?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if (Math.abs(i - page) === 3) {
+      btns += `<span style="color:var(--muted);padding:5px">…</span>`;
+    }
+  }
+  btns += `<button class="page-btn" onclick="goPage(${page+1})" ${page===pages?'disabled':''}>›</button>`;
+  document.getElementById('pageBtns').innerHTML = btns;
+}
+
+function goPage(p) {
+  const max = Math.ceil(filtered.length / perPage);
+  if (p < 1 || p > max) return;
+  page = p;
+  renderTable();
+}
+
+// ================== ALERTS ==================
+function renderAlerts() {
+  const alerts = DATA
+    .filter(c => ['Vencido','Crítico','Atenção'].includes(c.statusVencimento))
+    .sort((a,b) => (a.diasVencimento ?? 9999) - (b.diasVencimento ?? 9999));
+
+  const icons = { Vencido: '🚨', 'Crítico': '⚠️', 'Atenção': '📋' };
+  const cls = { Vencido: 'vencido', 'Crítico': 'critico', 'Atenção': 'atencao' };
+
+  document.getElementById('alertList').innerHTML = alerts.map(c => `
+    <div class="alert-item ${cls[c.statusVencimento]}" onclick="showDetail('${c.cod}')">
+      <div class="alert-icon">${icons[c.statusVencimento]}</div>
+      <div class="alert-info">
+        <div class="alert-empresa">${c.empresa}</div>
+        <div class="alert-meta">${c.cod} · ${c.tipo} · ${c.centroCusto} · Resp: ${c.responsavel}</div>
+        <div class="alert-meta" style="margin-top:4px">${c.observacoes || '—'} · Vencimento: ${c.dataTermino ? fmtDate(c.dataTermino) : '—'}</div>
+      </div>
+      <div>
+        <div class="alert-days" style="color:${diasColor(c.diasVencimento)}">${c.diasVencimento !== null ? Math.abs(c.diasVencimento) : '?'}</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center">${c.diasVencimento !== null && c.diasVencimento < 0 ? 'dias atrás' : 'dias'}</div>
+      </div>
+    </div>
+  `).join('') || '<div style="color:var(--muted);text-align:center;padding:40px">✅ Nenhum contrato em alerta com os filtros atuais.</div>';
+}
+
+// ================== MODAL ==================
+function showDetail(cod) {
+  const c = DATA.find(d => d.cod === cod);
+  if (!c) return;
+  document.getElementById('modalTitle').textContent = c.empresa;
+  document.getElementById('modalCod').textContent = c.cod;
+  const cl = { Vencido:'vencido', 'Crítico':'critico', 'Atenção':'atencao', Seguro:'seguro', Indefinido:'indefinido' };
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-field"><label>Código</label><span style="font-family:'DM Mono',monospace;color:var(--accent)">${c.cod}</span></div>
+    <div class="modal-field"><label>Tipo</label><span class="badge tipo">${c.tipo}</span></div>
+    <div class="modal-field"><label>Valor Total</label><span class="money">R$ ${fmtK(c.valorTotal)}</span></div>
+    <div class="modal-field"><label>Valor Mensal</label><span class="money">${c.valorMensal > 0 ? 'R$ '+fmtK(c.valorMensal) : '—'}</span></div>
+    <div class="modal-field"><label>Data Início</label><span>${c.dataInicio ? fmtDate(c.dataInicio) : '—'}</span></div>
+    <div class="modal-field"><label>Data Término</label><span>${c.dataTermino && new Date(c.dataTermino).getFullYear() < 2500 ? fmtDate(c.dataTermino) : c.dataTermino ? 'Permanente' : '—'}</span></div>
+    <div class="modal-field"><label>Status Vencimento</label><span class="badge ${cl[c.statusVencimento]||'indefinido'}">${c.statusVencimento}</span></div>
+    <div class="modal-field"><label>Dias para Vencimento</label><span style="color:${diasColor(c.diasVencimento)};font-family:'DM Mono',monospace">${c.diasVencimento !== null && new Date(c.dataTermino).getFullYear() < 2500 ? c.diasVencimento + ' dias' : '∞'}</span></div>
+    <div class="modal-field"><label>Índice Reajuste</label><span>${c.indiceReajuste || '—'}</span></div>
+    <div class="modal-field"><label>Status Contrato</label><span>${c.status}</span></div>
+    <div class="modal-field"><label>Centro de Custo</label><span>${c.centroCusto}</span></div>
+    <div class="modal-field"><label>Responsável</label><span>${c.responsavel}</span></div>
+    <div class="modal-field"><label>Tags</label><span>${c.tags || '—'}</span></div>
+    <div class="modal-field full"><label>Observações</label><span>${c.observacoes || '—'}</span></div>
+    <div class="modal-field"><label>Valor Anual Est.</label><span class="money">R$ ${fmtK(c.valorAnual)}</span></div>
+    <div class="modal-field"><label>Prazo Renovação</label><span>${c.prazRenovacao > 0 ? c.prazRenovacao + ' meses' : '—'}</span></div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e) {
+  if (e.target.id === 'modalOverlay') document.getElementById('modalOverlay').classList.remove('open');
+}
+
+// ================== VIEWS ==================
+function switchView(v) {
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + v).classList.add('active');
+  const tabs = ['dashboard','contratos','alertas','config'];
+  const idx = tabs.indexOf(v);
+  if (idx >= 0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  if (v === 'contratos') renderTable();
+  if (v === 'config') {
+    const savedUrl = getSavedUrl();
+    if (savedUrl) document.getElementById('sheetsUrl').value = savedUrl;
+    updateLastSyncInfo();
+  }
+}
+
+// ================== EXPORT ==================
+function exportCSV() {
+  const cols = ['cod','empresa','tipo','observacoes','valorTotal','valorMensal','valorAnual','dataInicio','dataTermino','diasVencimento','statusVencimento','centroCusto','responsavel','status','indiceReajuste','tags'];
+  const hdrs = ['Código','Empresa','Tipo','Observações','Valor Total','Valor Mensal','Valor Anual','Data Início','Data Término','Dias Vencimento','Status Vencimento','Centro de Custo','Responsável','Status','Índice Reajuste','Tags'];
+  let csv = hdrs.join(';') + '\n';
+  filtered.forEach(c => {
+    csv += cols.map(k => `"${(c[k]??'').toString().replace(/"/g,'""')}"`).join(';') + '\n';
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `contratos_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ================== HELPERS ==================
+function fmtK(v) {
+  if (!v && v !== 0) return '0';
+  if (v >= 1000000) return (v/1000000).toFixed(1).replace('.',',') + 'M';
+  if (v >= 1000) return (v/1000).toFixed(0) + 'K';
+  return v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+}
+function fmtM(v) {
+  if (v >= 1000000) return (v/1000000).toFixed(2).replace('.',',') + 'M';
+  if (v >= 1000) return (v/1000).toFixed(1).replace('.',',') + 'K';
+  return v.toLocaleString('pt-BR', {minimumFractionDigits:0, maximumFractionDigits:0});
+}
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+function diasColor(d) {
+  if (d === null || d === undefined) return 'var(--muted)';
+  if (d < 0) return 'var(--red)';
+  if (d <= 30) return 'var(--orange)';
+  if (d <= 60) return 'var(--yellow)';
+  return 'var(--green)';
+}
+function countBy(arr, key) {
+  return arr.reduce((acc, c) => {
+    const v = c[key] || 'N/A';
+    acc[v] = (acc[v] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+init();
+</script>
+</body>
+</html>
